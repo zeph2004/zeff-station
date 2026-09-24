@@ -1,0 +1,9 @@
+build/
+*.o
+*.d
+.DS_Store
+roms/*.gba
+roms/*.bin
+*.sav
+*.ppm
+!roms/.gitkeep
