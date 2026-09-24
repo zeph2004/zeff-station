@@ -1,8 +1,26 @@
-# Specification & Prompt: Build "Zeff Station" 1:1 GBA Emulator in C for macOS
+# Specification & Prompt: Build 1:1 GBA Emulator in C for macOS
 
-You are tasked with building **Zeff Station**, a cycle-accurate, 1:1 Game Boy Advance (GBA) emulator written in C99 and Objective-C from first principles. It must run natively on macOS with **zero external third-party dependencies** (no SDL, no external libraries; use native macOS Cocoa/AppKit and CoreAudio frameworks).
+You are tasked with building a cycle-accurate, 1:1 Game Boy Advance (GBA) emulator written in C99 and Objective-C from first principles. It must run natively on macOS with **zero external third-party dependencies** (no SDL, no external libraries; use native macOS Cocoa/AppKit and CoreAudio frameworks).
 
-Instead of standard Nintendo branding, the emulator features custom **Zeff Station** branding, an animated retro intro sequence, an authentic synthesized harmonic boot chime, and high-performance macOS desktop integration. It must be capable of booting commercial GBA titles (including *Super Mario Advance 2*, *Dragon Ball: Advanced Adventure*, etc.) with pixel-perfect visual fidelity, accurate audio, and full save game persistence.
+Instead of standard Nintendo branding, the emulator features custom branding, an animated retro intro sequence, an authentic synthesized harmonic boot chime, and high-performance macOS desktop integration. It must be capable of booting commercial GBA titles (including *Super Mario Advance 2*, *Dragon Ball: Advanced Adventure*, etc.) with pixel-perfect visual fidelity, accurate audio, and full save game persistence.
+
+---
+
+## 0. MANDATORY PRE-EXECUTION STEP: Ask for Custom Branding Name
+
+> [!IMPORTANT]
+> **BEFORE writing any files, creating directories, or executing code**, you MUST pause and ask the user for their preferred custom branding name.
+
+### Prompt to Present to User:
+> *"Before we begin building your GBA emulator, what custom branding name would you like to use for the system? (Default: **Zeff Station**)"*
+
+### How to Apply the User's Choice:
+1. **Fallback / Default**: If the user provides a blank response, presses enter, or confirms they want the default, use **Zeff Station**.
+2. **Project-Wide Integration**:
+   - **Boot Intro Sequence**: In the animated retro BIOS boot sequence in `src/bios.c`, render the user's chosen branding name (e.g. `"<BRAND> ADVANCE SYSTEM"`) in the glowing 5x7 font.
+   - **CLI Banner & Help**: Display the chosen branding name on startup in `src/main.c`.
+   - **Desktop Window Title**: Use the branding name in the Cocoa title bar in `src/frontend_cocoa.m` (e.g. `"<BRAND> - [Game Title]"`).
+   - **Documentation & Makefile**: Reflect the chosen brand name in `README.md` and the binary executable name (e.g. `build/<brand_slug>` with symlink `build/gba_emulator`).
 
 ---
 
@@ -233,8 +251,8 @@ Implement built-in HLE BIOS routines:
 - `SoftReset` (`0x00`), `RegisterRamReset` (`0x01`), `Halt` (`0x02`), `Stop` (`0x03`), `IntrWait` (`0x04`), `VBlankIntrWait` (`0x05`), `Div` (`0x06`), `DivArm` (`0x07`), `Sqrt` (`0x08`), `ArcTan` (`0x09`), `ArcTan2` (`0x0A`), `CpuSet` (`0x0B`), `CpuFastSet` (`0x0C`), `BgAffineSet` (`0x0E`), `ObjAffineSet` (`0x0F`), `BitUnPack` (`0x10`), `LZ77UnCompWram`/`Vram` (`0x11`/`0x12`), `RLUnCompWram`/`Vram` (`0x14`/`0x15`), `SoundBias` (`0x19`).
 - **CRITICAL: VRAM Decompression Buffering**:
   `LZ77UnCompVram` (`0x12`) and `RLUnCompVram` (`0x15`) must decompress into a RAM staging buffer and commit full **16-bit halfwords** to VRAM, avoiding 8-bit write corruption on the VRAM bus.
-- **Zeff Station Boot Sequence**:
-  - Render an animated 90-frame starry boot sequence displaying **ZEFF STATION ADVANCE SYSTEM** with gold and cyan glowing typography using an embedded 5x7 bitmap font.
+- **Custom Boot Sequence (Using Selected Branding Name)**:
+  - Render an animated 90-frame starry boot sequence displaying the chosen branding (e.g. **<BRAND> ADVANCE SYSTEM**, or default **ZEFF STATION ADVANCE SYSTEM**) with gold and cyan glowing typography using an embedded 5x7 bitmap font.
   - Synthesize a harmonic 2-tone chime through APU Channel 1 during frames 10–50.
   - Allow skipping the intro immediately via `Start`, `A`, or the `--skip-intro` CLI flag.
   - Setup post-boot CPU registers (`SP_usr = 0x03007F00`, `SP_irq = 0x03007FA0`, `SP_svc = 0x03007FE0`, `CPSR = MODE_SYS`, `PC = 0x08000000`).
